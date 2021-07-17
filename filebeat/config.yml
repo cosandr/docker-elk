@@ -1,0 +1,25 @@
+filebeat.config:
+  modules:
+    path: ${path.config}/modules.d/*.yml
+    reload.enabled: false
+
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+
+filebeat.inputs:
+- type: log
+  paths:
+    - /host/var/log/grafana/grafana.log
+    - /host/var/log/gitea/gitea.log
+    - /host/var/log/dnf.rpm.log
+    - /host/var/log/nginx/*.log
+    - /host/var/log/nginx/sites/*.log
+
+output.elasticsearch:
+  hosts: '${ELASTICSEARCH_HOSTS:-"elasticsearch:9200"}'
+  protocol: "${ELASTICSEARCH_PROTOCOL:-http}"
+  api_key: '${ELASTICSEARCH_API_KEY:}'
+
+logging.level: warning

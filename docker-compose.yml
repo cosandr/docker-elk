@@ -1,22 +1,22 @@
 version: '3.2'
 
+networks:
+  elk:
+    driver: bridge
+
+volumes:
+  elasticsearch:
+
 services:
   elasticsearch:
-    build:
-      context: elasticsearch/
-      args:
-        ELK_VERSION: $ELK_VERSION
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION}
+    container_name: elasticsearch
     volumes:
-      - type: bind
-        source: ./elasticsearch/config/elasticsearch.yml
-        target: /usr/share/elasticsearch/config/elasticsearch.yml
-        read_only: true
-      - type: volume
-        source: elasticsearch
-        target: /usr/share/elasticsearch/data
+      - 'elasticsearch:/usr/share/elasticsearch/data'
+      - './elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro'
     ports:
       - "9200:9200"
-      - "9300:9300"
+      - "127.0.0.1:9201:9300"
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
       ELASTIC_PASSWORD: changeme
@@ -26,25 +26,34 @@ services:
     networks:
       - elk
 
-  logstash:
-    build:
-      context: logstash/
-      args:
-        ELK_VERSION: $ELK_VERSION
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${ELK_VERSION}
+    container_name: kibana
+    environment:
+      ELASTICSEARCH_USERNAME: "kibana_system"
+      ELASTICSEARCH_PASSWORD: "${PASSWORD_kibana_system:?err}"
     volumes:
-      - type: bind
-        source: ./logstash/config/logstash.yml
-        target: /usr/share/logstash/config/logstash.yml
-        read_only: true
-      - type: bind
-        source: ./logstash/pipeline
-        target: /usr/share/logstash/pipeline
-        read_only: true
+      - './kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro'
     ports:
-      - "5044:5044"
-      - "5000:5000/tcp"
-      - "5000:5000/udp"
-      - "9600:9600"
+      - "127.0.0.1:9205:5601/tcp"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:${ELK_VERSION}
+    container_name: logstash
+    environment:
+      ELASTICSEARCH_USERNAME: "elastic"
+      ELASTICSEARCH_PASSWORD: "${PASSWORD_elastic:?err}"
+    volumes:
+      - './logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro'
+      - './logstash/pipeline:/usr/share/logstash/pipeline:ro'
+    ports:
+      - "127.0.0.1:9202:5044/tcp"
+      - "127.0.0.1:9203:5000/tcp"
+      - "127.0.0.1:9204:9600/tcp"
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
     networks:
@@ -52,26 +61,25 @@ services:
     depends_on:
       - elasticsearch
 
-  kibana:
-    build:
-      context: kibana/
-      args:
-        ELK_VERSION: $ELK_VERSION
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:$ELK_VERSION
+    container_name: filebeat
+    user: root
+    hostname: ${C_DOMAIN:?err}
+    command:
+      - "filebeat"
+      - "-e"
+      - "-strict.perms=false"
+    environment:
+      ELASTICSEARCH_HOSTS: "elasticsearch:9200"
+      ELASTICSEARCH_PROTOCOL: "http"
+      ELASTICSEARCH_API_KEY: "${FILEBEAT_API_KEY:?err}"
     volumes:
-      - type: bind
-        source: ./kibana/config/kibana.yml
-        target: /usr/share/kibana/config/kibana.yml
-        read_only: true
-    ports:
-      - "5601:5601"
+      - "./filebeat/config.yml:/usr/share/filebeat/filebeat.yml:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/var/lib/docker/containers:/var/lib/docker/containers:ro"
+      - "/var/log:/host/var/log:ro"
     networks:
       - elk
     depends_on:
       - elasticsearch
-
-networks:
-  elk:
-    driver: bridge
-
-volumes:
-  elasticsearch:
