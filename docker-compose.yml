@@ -11,6 +11,7 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION}
     container_name: elasticsearch
+    hostname: ${HOSTNAME:?err}
     volumes:
       - 'elasticsearch:/usr/share/elasticsearch/data'
       - './elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro'
@@ -30,6 +31,7 @@ services:
   kibana:
     image: docker.elastic.co/kibana/kibana:${ELK_VERSION}
     container_name: kibana
+    hostname: ${HOSTNAME:?err}
     environment:
       ELASTICSEARCH_USERNAME: "kibana_system"
       ELASTICSEARCH_PASSWORD: "${PASSWORD_kibana_system:?err}"
@@ -46,6 +48,7 @@ services:
   logstash:
     image: docker.elastic.co/logstash/logstash:${ELK_VERSION}
     container_name: logstash
+    hostname: ${HOSTNAME:?err}
     volumes:
       - './logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro'
       - './logstash/pipeline:/usr/share/logstash/pipeline:ro'
@@ -69,7 +72,7 @@ services:
     image: docker.elastic.co/beats/filebeat:$ELK_VERSION
     container_name: filebeat
     user: root
-    hostname: ${C_DOMAIN:?err}
+    hostname: ${HOSTNAME:?err}
     command:
       - "filebeat"
       - "-e"
