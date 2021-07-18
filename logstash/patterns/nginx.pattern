@@ -1,4 +1,4 @@
 # https://gist.github.com/mariotacke/88053be5be5ef87b7544ece220f41af4
 NGINX_ACCESS %{IPORHOST:remote_addr} - %{USERNAME:remote_user} \[%{HTTPDATE:time_local}\] \"%{DATA:request}\" %{INT:status} %{NUMBER:bytes_sent} \"%{DATA:http_referer}\" \"%{DATA:http_user_agent}\"
 # https://serverfault.com/a/941277
-NGINX_ERROR  (?<timestamp>%{YEAR}[./]%{MONTHNUM}[./]%{MONTHDAY} %{TIME}) \[%{LOGLEVEL:severity}\] %{POSINT:pid}#%{NUMBER:threadid}\: \*%{NUMBER:connectionid} %{GREEDYDATA:message}, client: %{IP:client}, server: %{GREEDYDATA:server}, request: "(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion}))", upstream: "%{GREEDYDATA:upstream}", host: %{GREEDYDATA:host}
+NGINX_ERROR  (?<timestamp>%{YEAR}[./]%{MONTHNUM}[./]%{MONTHDAY} %{TIME}) \[%{LOGLEVEL:loglevel}\] %{POSINT:pid}#%{NUMBER:threadid}\: \*%{NUMBER:connectionid} %{GREEDYDATA:message}, client: %{IP:client}, server: %{GREEDYDATA:server}, request: "(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion}))", upstream: "%{GREEDYDATA:upstream}", host: %{GREEDYDATA:host}
