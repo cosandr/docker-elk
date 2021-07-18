@@ -2,7 +2,8 @@
 ## Default Elasticsearch configuration from Elasticsearch base image.
 ## https://github.com/elastic/elasticsearch/blob/master/distribution/docker/src/docker/config/elasticsearch.yml
 #
-cluster.name: "dresrv"
+cluster.name: '${CLUSTER_NAME:-"escl01"}'
+node.name: '${NODE_NAME:-"esno01"}'
 network.host: 0.0.0.0
 
 ## X-Pack settings
