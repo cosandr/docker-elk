@@ -6,6 +6,7 @@ http.host: "0.0.0.0"
 xpack.monitoring.elasticsearch.hosts: [ "http://elasticsearch:9200" ]
 
 log.level: warn
+pipeline.ecs_compatibility: disabled
 
 ## X-Pack security credentials
 #

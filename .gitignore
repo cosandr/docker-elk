@@ -1,2 +1,2 @@
 .env
-logstash/pipeline/logstash.conf
+logstash/pipeline/output.conf
