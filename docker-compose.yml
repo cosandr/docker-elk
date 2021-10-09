@@ -58,11 +58,14 @@ services:
     hostname: ${HOSTNAME:?err}
     volumes:
       - './logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro'
+      - './certs/ca.crt:/etc/ca.crt:ro'
+      - './certs/logstash_beats.crt:/etc/beats.crt:ro'
+      - './certs/logstash_beats.key:/etc/beats.key:ro'
       - './logstash/pipeline:/usr/share/logstash/pipeline:ro'
       - './logstash/patterns:/usr/share/logstash/patterns:ro'
       - "/var/log:/host/var/log:ro"
     ports:
-      - "127.0.0.1:9202:5044/tcp"
+      - "5044:5044/tcp"
       - "127.0.0.1:9203:5000/tcp"
       - "127.0.0.1:9204:9600/tcp"
     environment:
