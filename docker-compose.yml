@@ -66,6 +66,7 @@ services:
       - './logstash/patterns:/usr/share/logstash/patterns:ro'
       - "/var/log:/host/var/log:ro"
       - "logstash:/usr/share/logstash/data"
+      - "../mrbot/src/mrbot.log:/var/log/mrbot.log:ro"
     ports:
       - "5044:5044/tcp"
       - "127.0.0.1:9203:5000/tcp"
