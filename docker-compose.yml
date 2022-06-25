@@ -37,12 +37,16 @@ services:
       retries: 5
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:${ELK_VERSION}
+    image: docker.elastic.co/kibana/kibana:7.13.4
     container_name: kibana
     hostname: ${HOSTNAME:?err}
     environment:
       ELASTICSEARCH_USERNAME: "kibana_system"
       ELASTICSEARCH_PASSWORD: "${PASSWORD_kibana_system:?err}"
+      KIBANA_OBJECTS_KEY: "${KIBANA_OBJECTS_KEY:?err}"
+      KIBANA_REPORTING_KEY: "${KIBANA_REPORTING_KEY:?err}"
+      KIBANA_SECURITY_KEY: "${KIBANA_SECURITY_KEY:?err}"
+      # KIBANA_DOMAIN: "https://kibana.${C_DOMAIN}"
       logger.level: WARN
     volumes:
       - './kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro'

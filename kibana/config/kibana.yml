@@ -4,6 +4,7 @@
 #
 server.name: kibana
 server.host: 0.0.0.0
+# server.publicBaseUrl: '${KIBANA_DOMAIN:}'
 elasticsearch.hosts: [ "http://elasticsearch:9200" ]
 monitoring.ui.container.elasticsearch.enabled: true
 
@@ -15,3 +16,8 @@ logging:
 #
 elasticsearch.username: '${ELASTICSEARCH_USERNAME:-elastic}'
 elasticsearch.password: '${ELASTICSEARCH_PASSWORD:-changeme}'
+
+# /usr/share/kibana/bin/kibana-encryption-keys generate -q
+xpack.encryptedSavedObjects.encryptionKey: '${KIBANA_OBJECTS_KEY}'
+xpack.reporting.encryptionKey: '${KIBANA_REPORTING_KEY}'
+xpack.security.encryptionKey: '${KIBANA_SECURITY_KEY}'
